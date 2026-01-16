@@ -8,3 +8,9 @@ dist/
 build/
 .DS_Store
 npm-debug.log*
+
+fetch.d.ts
+fetch.d.ts.map
+fetch.js
+fetch.js.map
+eslint.config.mjs
