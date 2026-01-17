@@ -1,54 +1,29 @@
 import 'dotenv/config';
-import { type Job, type JobsItem, type JobSearchResult, mapJobsItemToJobs } from './types';
+import { type Flags, type Job, type JobsItem, type JobSearchResult, mapJobsItemToJobs } from './types';
 
-const args = process.argv.slice(2);
-if (!args[0] || !args[1]) {
-  console.error('incorrect usage');
-  process.exit(1);
-}
+function parseFlags(args:string[]):Flags {
+  const flags:Flags = {};
 
-let key:string;
-let value:string;
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
 
-if (args[0].startsWith('--')) {
-  key = args[0].slice(2);
-  value = args[1];
-    
-  if (!value) {
-    throw new Error(`missing argument for ${key}`);
+    if (!arg?.startsWith('-')) continue;
+
+    const key = arg.replace(/^--?/, '');
+    const value = args[i + 1];
+
+    if (!value || value.startsWith('-')) {
+      throw new Error(`missing value for ${key}`);
+    }
+
+    if (key == 'k') flags.keyword = key;
+    if (key == 'keyword') flags.keyword = key;
+    if (key == 'l') flags.keyword = key;
+    if (key == 'location') flags.keyword = key;
+
+    i++;
   }
-
-} else {
-  key = args[0];
-  value = args[1];
-}
-
-let keyword = '';
-if (key == 'keyword' || key == 'k') {
-  keyword = value;
-}
-
-if (!args[2] || !args[3]) {
-  console.error('incorrect usage');
-  process.exit(1);
-}
-
-if (args[2].startsWith('--')) {
-  key = args[2].slice(2);
-  value = args[3];
-    
-  if (!value) {
-    throw new Error(`missing argument for ${key}`);
-  }
-
-} else {
-  key = args[2];
-  value = args[3];
-}
-
-let location = '';
-if (key == 'location' || key == 'l') {
-  location = value;
+  return flags;
 }
 
 async function fetchJobs(keyword: string, location: string): Promise<Job[]> {
@@ -73,21 +48,33 @@ async function fetchJobs(keyword: string, location: string): Promise<Job[]> {
     throw new Error(`error: ${res.status}`);
   }
   
-  const data: JobSearchResult = await res.json();
-  const items: JobsItem[] = data.SearchResult?.SearchResultItems ?? [];
-  const jobs: Job[] = items.map(mapJobsItemToJobs)
+  const data : JobSearchResult = await res.json();
+  const items : JobsItem[] = data.SearchResult?.SearchResultItems ?? [];
+  const jobs : Job[] = items.map(mapJobsItemToJobs);
+
   return jobs;
 }
 
-async function main(): Promise<void> {
-  const jobs: Job[] = await fetchJobs(keyword, location);
-  console.log(`found ${jobs.length} job(s)`);
-/*   if (jobs.length > 0) {
-    jobs.forEach((job) => {
-      console.log(job.title);
-    });
-  } */
-  console.log(args);
+//* main function rewrite
+async function main() : Promise<void> {
+  const flags = parseFlags(process.argv.slice(2));
+
+  if (!flags.keyword || !flags.location) {
+    console.error(`Usage: node fetch.js --keyword <keyword> --location "<city, state>" or <ZIP>`);
+    process.exit(1);
+  }
+
+  try {
+    const jobs = await fetchJobs(flags.keyword, flags.location);
+    console.log(`found ${jobs.length} job(s)`);
+    if (jobs.length > 0) {
+      for (const job of jobs) {
+        console.log(job.title);
+      }
+    }
+  } catch (err) {
+    console.error('error:', err)
+  }
 }
 
 main();
