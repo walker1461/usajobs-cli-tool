@@ -14,7 +14,7 @@ export interface SearchResult {
 }
 
 export interface JobSearchResult {
-  SearchResult: SearchResult;
+  SearchResult?: SearchResult;
 }
 
 //* internal types
@@ -23,4 +23,14 @@ export interface Job {
     location: string;
     department: string;
     category: string;
+}
+
+export function mapJobsItemToJobs(item: JobsItem): Job {
+  const job = item.MatchedObjectDescriptor;
+  return {
+    title: job.PositionTitle,
+    location: job.PositionLocationDisplay,
+    department: job.DepartmentName,
+    category: job.JobCategory?.[0]?.Name ?? 'Unknown'
+  }
 }
