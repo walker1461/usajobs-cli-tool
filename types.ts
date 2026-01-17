@@ -34,3 +34,8 @@ export function mapJobsItemToJobs(item: JobsItem): Job {
     category: job.JobCategory?.[0]?.Name ?? 'Unknown'
   }
 }
+
+export interface Flags {
+  keyword?: string,
+  location?: string
+}
