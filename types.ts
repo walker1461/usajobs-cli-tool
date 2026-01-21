@@ -37,5 +37,6 @@ export function mapJobsItemToJobs(item: JobsItem): Job {
 
 export interface Flags {
   keyword?: string,
-  location?: string
+  location?: string,
+  radius?: string
 }
