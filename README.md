@@ -4,7 +4,7 @@ This is a command line application that I created to practice retrieving and man
 
 ## Usage
 
-`node fetch.js --keyword <keyword> --location "<city, state>" or <ZIP>`
+`node fetch.js --keyword <keyword> --location "<city, state>" or <ZIP>`  
 Shortcuts `--k` and `--l` can be used respectively
 
 ___
